@@ -1,0 +1,23 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "BASH cookbook",
+    "section": "",
+    "text": "This is a cook book for key BASH commands."
+  },
+  {
+    "objectID": "1_Basics.html",
+    "href": "1_Basics.html",
+    "title": "1  Bash basics",
+    "section": "",
+    "text": "column -ts $'\\t' file"
+  },
+  {
+    "objectID": "1_Basics.html#add-a-header-to-a-table",
+    "href": "1_Basics.html#add-a-header-to-a-table",
+    "title": "1  Bash basics",
+    "section": "1.2 Add a header to a table",
+    "text": "1.2 Add a header to a table\n\necho -e \"accession_long\\taccession_short\\tBinID\" | cat - Input.txt > Input_w_header.txt"
+  }
+]

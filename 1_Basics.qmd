@@ -1,0 +1,14 @@
+# Bash basics
+
+## View a file with tab separated columns
+
+```{bash eval=FALSE}
+column -ts $'\t' file
+```
+
+
+## Add a header to a table
+
+```{bash}
+echo -e "accession_long\taccession_short\tBinID" | cat - Input.txt > Input_w_header.txt
+```
