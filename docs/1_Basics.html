@@ -93,6 +93,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./2_Variables.html" rel="next">
 <link href="./index.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -168,6 +169,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <a href="./1_Basics.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Bash basics</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./2_Variables.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Using variables</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -179,6 +185,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <ul>
   <li><a href="#view-a-file-with-tab-separated-columns" id="toc-view-a-file-with-tab-separated-columns" class="nav-link active" data-scroll-target="#view-a-file-with-tab-separated-columns"><span class="toc-section-number">1.1</span>  View a file with tab separated columns</a></li>
   <li><a href="#add-a-header-to-a-table" id="toc-add-a-header-to-a-table" class="nav-link" data-scroll-target="#add-a-header-to-a-table"><span class="toc-section-number">1.2</span>  Add a header to a table</a></li>
+  <li><a href="#removed-a-header-or-more-rows-from-a-file" id="toc-removed-a-header-or-more-rows-from-a-file" class="nav-link" data-scroll-target="#removed-a-header-or-more-rows-from-a-file"><span class="toc-section-number">1.3</span>  Removed a header (or more rows) from a file</a></li>
+  <li><a href="#using-join" id="toc-using-join" class="nav-link" data-scroll-target="#using-join"><span class="toc-section-number">1.4</span>  Using join</a></li>
   </ul>
 </nav>
     </div>
@@ -201,16 +209,75 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
+<p>If we actually want to run a bash chunk in quarto we do:</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-l</span> <span class="pp">*</span> <span class="kw">|</span> <span class="fu">head</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-rw-r--r--  1 ninadombrowski  staff  3374 Sep 13 11:02 1_Basics.ipynb</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-rw-r--r--@ 1 ninadombrowski  staff  1300 Sep 13 11:02 1_Basics.qmd</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-rw-r--r--@ 1 ninadombrowski  staff  3425 Sep  9 15:20 2_Variables.qmd</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-rw-r--r--@ 1 ninadombrowski  staff   205 Sep 13 10:58 Bash.Rproj</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-rw-r--r--@ 1 ninadombrowski  staff   703 Sep 13 11:00 _quarto.yml</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-rw-r--r--  1 ninadombrowski  staff  9643 Sep 13 11:02 index.html</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-rw-r--r--@ 1 ninadombrowski  staff   303 Sep  1 14:32 index.qmd</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-rw-r--r--  1 ninadombrowski  staff    66 Sep  2 14:34 readme.qmd</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-rw-r--r--  1 ninadombrowski  staff   417 Aug 31 18:22 references.bib</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code></code></pre>
+</div>
+</div>
 <section id="view-a-file-with-tab-separated-columns" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="view-a-file-with-tab-separated-columns"><span class="header-section-number">1.1</span> View a file with tab separated columns</h2>
-<div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">column</span> <span class="at">-ts</span> <span class="st">$'</span><span class="dt">\t</span><span class="st">'</span> file</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">column</span> <span class="at">-ts</span> <span class="st">$'</span><span class="dt">\t</span><span class="st">'</span> file</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="add-a-header-to-a-table" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="add-a-header-to-a-table"><span class="header-section-number">1.2</span> Add a header to a table</h2>
-<div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-e</span> <span class="st">"accession_long\taccession_short\tBinID"</span> <span class="kw">|</span> <span class="fu">cat</span> <span class="at">-</span> Input.txt <span class="op">&gt;</span> Input_w_header.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-e</span> <span class="st">"accession_long\taccession_short\tBinID"</span> <span class="kw">|</span> <span class="fu">cat</span> <span class="at">-</span> Input.txt <span class="op">&gt;</span> Input_w_header.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="removed-a-header-or-more-rows-from-a-file" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="removed-a-header-or-more-rows-from-a-file"><span class="header-section-number">1.3</span> Removed a header (or more rows) from a file</h2>
+<p>Remove the header:</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="st">'1d'</span> input <span class="op">&gt;</span> output</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Remove the first 3 rows:</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-e</span> <span class="st">'1,3d'</span> input <span class="op">&gt;</span> output</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="using-join" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="using-join"><span class="header-section-number">1.4</span> Using join</h2>
+<p>Join allows to join two files on a common field.</p>
+<p>In the example:</p>
+<ul>
+<li>LC_ALL=C: forces applications to use the default language for output and makes sure that programs use the same langauge. I.e. this setting in combination with sort sorts by byte value (when using the sort command it’s gonna give you different types of sorting based on the locale). Using it in combination with grep speeds things up.</li>
+<li>-a1: the common field can be found in column 2 in file1 and column 1 in file2.</li>
+<li>-e: empty fields we fill with -</li>
+<li>-o: specify what columns we want to keep in the new dataframe and in what order</li>
+</ul>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="va">LC_ALL</span><span class="op">=</span>C <span class="fu">join</span> <span class="at">-a1</span> <span class="at">-1</span> 2 <span class="at">-2</span> 1 <span class="at">-e</span><span class="st">'-'</span> <span class="at">-o1.1,0,2.3,2.4,2.2,1.3</span> <span class="op">&lt;(</span><span class="va">LC_ALL</span><span class="op">=</span>C <span class="fu">sort</span> <span class="at">-k2</span>  file1<span class="op">)</span> <span class="op">&lt;(</span><span class="va">LC_ALL</span><span class="op">=</span>C <span class="fu">sort</span> <span class="at">-k1</span> file<span class="op">)</span> <span class="at">-t</span> <span class="st">$'</span><span class="dt">\t</span><span class="st">'</span> <span class="kw">|</span> <span class="va">LC_ALL</span><span class="op">=</span>C  <span class="fu">sort</span> <span class="op">&gt;</span> new_file</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
@@ -322,6 +389,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="./2_Variables.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Using variables</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

@@ -11,6 +11,7 @@ book:
   chapters:
     - index.qmd
     - 1_Basics.qmd
+    - 2_Variables.qmd
 
 bibliography: references.bib
 
@@ -36,6 +37,6 @@ format:
 execute:
   eval: false
 
-knitr:
-  opts_chunk:
-    collapse: true
+#knitr:
+#  opts_chunk:
+#    collapse: true

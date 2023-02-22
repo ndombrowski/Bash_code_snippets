@@ -1,0 +1,82 @@
+# Using variables
+
+## Convert contents of a table to several variables (SLURM)
+
+Example table (FileLists/best_model_perCOG_for_pmsf.txt): 
+
+COG0001_01	LG+C20+R+F
+COG0002_01	LG+C20+R+F
+COG0003_01	LG+C20+R+F
+
+Notice: 
+IFS indirectly determines how the output from the command is broken up into pieces that the loop iterates over. So in case we use another delimiter, such as a `;`, we could write ```while IFS="," read -r first second```
+
+```{bash}
+#if we set the variables before, remove them with
+unset variable_marker
+unset variable_model
+
+#store the two columns in two variables each
+while read -r first second; do 
+variable_marker+=("$first")
+variable_model+=("$second")
+done < FileLists/best_model_perCOG_for_default.txt
+
+#see if this works, don't forget, indices start at 0!
+echo ${variable_marker[2]}
+echo ${variable_model[2]}
+```
+
+Once the variables are stored in the system we can use them in our scripts, i.e when submitting to slurm.
+
+```{bash}
+iqtree2 -s Alignment/v3/bmge/${variable_marker[1]}.faa -m ${variable_model[1]} -ft Phylogeny/v2/iqtree_lg/${variable_marker[1]}.treefile -T 1 -wbtl -bb 1000 -bnni --prefix test/${variable_marker[1]}_PMSF
+```
+
+We can submit jobs via arrays on the slurm submission system. A maximum number of simultaneously running tasks from the job array may be specified using a "%" separator.
+
+```{bash}
+# Submit a job array with index values between 0 and 31
+$ sbatch --array=0-15%4    -N1 tmp
+
+#define job array in the job header
+#SBATCH --array=0-15%4 
+```
+
+Each sub-job in this job array will have a **SLURM_ARRAY_JOB_ID** that includes both the parent **SLURM_ARRAY_JOB_ID** and a unique **SLURM_ARRAY_TASK_ID** after the character underscore "_".
+
+Example slurm script:
+
+We want to run 4000 trees. Each tree needs two variables defined: one for the marker gene we want to run and one for the model we choose, named variable_marker and variable_model, respectively. So, we have 4000 jobs that we want to submit to the cluster via a slurm array with this script:
+
+```{bash}
+#!/bin/sh
+#SBATCH --job-name=iqtree_test
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --output=iqtree_test_%A_%a.out
+#SBATCH --error=iqtree_test_%A_%a.err
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=nina.dombrowski@nioz.nl
+#SBATCH --array=0-4000%10
+
+#load modules
+module load iqtree/2.1.2
+
+#store the marker/model combinations in two variables each
+while read -r first second; do 
+variable_marker+=("$first")
+variable_model+=("$second")
+done < FileLists/best_model_perCOG_for_default.txt
+
+#run trees
+#iqtree2 -s Alignment/v3/bmge/${variable_marker[$SLURM_ARRAY_TASK_ID]}.faa -m ${variable_model[$SLURM_ARRAY_TASK_ID]} -ft Phylogeny/v2/iqtree_lg/${variable_marker[$SLURM_ARRAY_TASK_ID]}.treefile -T 1 -wbtl -B 1000 -bnni --prefix Phylogeny/v2/psmf/${variable_marker[$SLURM_ARRAY_TASK_ID]}_PMSF
+
+iqtree2 -s Alignment/v3/bmge/${variable_marker[$SLURM_ARRAY_TASK_ID]}.faa -m ${variable_model[$SLURM_ARRAY_TASK_ID]} -T 1 -wbtl -B 1000 --prefix test/${variable_marker[$SLURM_ARRAY_TASK_ID]}_default
+```
+
+This works fine and 10 jobs are started in parallel BUT each runs separately on a full node despite requesting just one cpu. So resources are not used well and I was wondering if this is how laplace is setup or if there is a way that I could run 100 jobs at the same time one node has so many cpus?
+
+I know I can use gnu parallel, but I want to prep the script for a collaborator with arrays.
+
+

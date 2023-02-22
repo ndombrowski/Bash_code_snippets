@@ -1,6 +1,15 @@
 # Bash basics
 
+If we actually want to run a bash chunk in quarto we do:
+
+```{bash}
+#| eval: true
+ls -l * | head
+```
+
+
 ## View a file with tab separated columns
+
 
 ```{bash eval=FALSE}
 column -ts $'\t' file
@@ -12,3 +21,63 @@ column -ts $'\t' file
 ```{bash}
 echo -e "accession_long\taccession_short\tBinID" | cat - Input.txt > Input_w_header.txt
 ```
+
+## Removed a header (or more rows) from a file
+
+Remove the header:
+
+```{bash}
+sed '1d' input > output
+```
+
+Remove the first 3 rows:
+
+```{bash}
+sed -e '1,3d' input > output
+```
+
+## Using join
+
+Join allows to join two files on a common field.
+
+In the example:
+
+- LC_ALL=C: forces applications to use the default language for output and makes sure that programs use the same langauge. I.e. this setting in combination with sort sorts by byte value (when using the sort command it’s gonna give you different types of sorting based on the locale). Using it in combination with grep speeds things up.
+- -a1: the common field can be found in column 2 in file1 and column 1 in file2.
+- -e: empty fields we fill with -
+- -o: specify what columns we want to keep in the new dataframe and in what order
+
+```{bash}
+LC_ALL=C join -a1 -1 2 -2 1 -e'-' -o1.1,0,2.3,2.4,2.2,1.3 <(LC_ALL=C sort -k2  file1) <(LC_ALL=C sort -k1 file) -t $'\t' | LC_ALL=C  sort > new_file
+```
+
+
+
+## Work with PDFs
+
+Merge multiple pdfs into one:
+
+```{bash}
+pdftk *pdf cat output merged.pdf
+
+~/Tools/cpdf-binaries-master/Linux-Intel-64bit/cpdf *pdf -o merged.pdf
+```
+
+Convert to a4 format
+
+```{bash}
+~/Tools/cpdf-binaries-master/Linux-Intel-64bit/cpdf -scale-to-fit a4portrait 2_Conference_Certificate.pdf -o test.pdf
+```
+
+
+
+## Working with git/github
+
+When using git in vscode (and switching between WSL and Windows) there might be the issue that VSCode shows changed files but the content of the files don't look different. This has to do with a line-ending issue and the files switching modes. This can be controlled by typing the following in the vscode terminal:
+
+```{bash}
+git config core.fileMode false
+
+git config --global core.filemode false
+```
+

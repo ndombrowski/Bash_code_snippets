@@ -11,7 +11,14 @@
     "href": "1_Basics.html",
     "title": "1  Bash basics",
     "section": "",
-    "text": "column -ts $'\\t' file"
+    "text": "If we actually want to run a bash chunk in quarto we do:"
+  },
+  {
+    "objectID": "1_Basics.html#view-a-file-with-tab-separated-columns",
+    "href": "1_Basics.html#view-a-file-with-tab-separated-columns",
+    "title": "1  Bash basics",
+    "section": "1.1 View a file with tab separated columns",
+    "text": "1.1 View a file with tab separated columns\n\ncolumn -ts $'\\t' file"
   },
   {
     "objectID": "1_Basics.html#add-a-header-to-a-table",
@@ -19,5 +26,26 @@
     "title": "1  Bash basics",
     "section": "1.2 Add a header to a table",
     "text": "1.2 Add a header to a table\n\necho -e \"accession_long\\taccession_short\\tBinID\" | cat - Input.txt > Input_w_header.txt"
+  },
+  {
+    "objectID": "1_Basics.html#removed-a-header-or-more-rows-from-a-file",
+    "href": "1_Basics.html#removed-a-header-or-more-rows-from-a-file",
+    "title": "1  Bash basics",
+    "section": "1.3 Removed a header (or more rows) from a file",
+    "text": "1.3 Removed a header (or more rows) from a file\nRemove the header:\n\nsed '1d' input > output\n\nRemove the first 3 rows:\n\nsed -e '1,3d' input > output"
+  },
+  {
+    "objectID": "1_Basics.html#using-join",
+    "href": "1_Basics.html#using-join",
+    "title": "1  Bash basics",
+    "section": "1.4 Using join",
+    "text": "1.4 Using join\nJoin allows to join two files on a common field.\nIn the example:\n\nLC_ALL=C: forces applications to use the default language for output and makes sure that programs use the same langauge. I.e. this setting in combination with sort sorts by byte value (when using the sort command it’s gonna give you different types of sorting based on the locale). Using it in combination with grep speeds things up.\n-a1: the common field can be found in column 2 in file1 and column 1 in file2.\n-e: empty fields we fill with -\n-o: specify what columns we want to keep in the new dataframe and in what order\n\n\nLC_ALL=C join -a1 -1 2 -2 1 -e'-' -o1.1,0,2.3,2.4,2.2,1.3 <(LC_ALL=C sort -k2  file1) <(LC_ALL=C sort -k1 file) -t $'\\t' | LC_ALL=C  sort > new_file"
+  },
+  {
+    "objectID": "2_Variables.html",
+    "href": "2_Variables.html",
+    "title": "2  Using variables",
+    "section": "",
+    "text": "Example table (FileLists/best_model_perCOG_for_pmsf.txt):\nCOG0001_01 LG+C20+R+F COG0002_01 LG+C20+R+F COG0003_01 LG+C20+R+F\nNotice: IFS indirectly determines how the output from the command is broken up into pieces that the loop iterates over. So in case we use another delimiter, such as a ;, we could write while IFS=\",\" read -r first second\n\n#if we set the variables before, remove them with\nunset variable_marker\nunset variable_model\n\n#store the two columns in two variables each\nwhile read -r first second; do \nvariable_marker+=(\"$first\")\nvariable_model+=(\"$second\")\ndone < FileLists/best_model_perCOG_for_default.txt\n\n#see if this works, don't forget, indices start at 0!\necho ${variable_marker[2]}\necho ${variable_model[2]}\n\nOnce the variables are stored in the system we can use them in our scripts, i.e when submitting to slurm.\n\niqtree2 -s Alignment/v3/bmge/${variable_marker[1]}.faa -m ${variable_model[1]} -ft Phylogeny/v2/iqtree_lg/${variable_marker[1]}.treefile -T 1 -wbtl -bb 1000 -bnni --prefix test/${variable_marker[1]}_PMSF\n\nWe can submit jobs via arrays on the slurm submission system. A maximum number of simultaneously running tasks from the job array may be specified using a “%” separator.\n\n# Submit a job array with index values between 0 and 31\n$ sbatch --array=0-15%4    -N1 tmp\n\n#define job array in the job header\n#SBATCH --array=0-15%4 \n\nEach sub-job in this job array will have a SLURM_ARRAY_JOB_ID that includes both the parent SLURM_ARRAY_JOB_ID and a unique SLURM_ARRAY_TASK_ID after the character underscore “_“.\nExample slurm script:\nWe want to run 4000 trees. Each tree needs two variables defined: one for the marker gene we want to run and one for the model we choose, named variable_marker and variable_model, respectively. So, we have 4000 jobs that we want to submit to the cluster via a slurm array with this script:\n\n#!/bin/sh\n#SBATCH --job-name=iqtree_test\n#SBATCH --ntasks=1\n#SBATCH --cpus-per-task=1\n#SBATCH --output=iqtree_test_%A_%a.out\n#SBATCH --error=iqtree_test_%A_%a.err\n#SBATCH --mail-type=END,FAIL\n#SBATCH --mail-user=nina.dombrowski@nioz.nl\n#SBATCH --array=0-4000%10\n\n#load modules\nmodule load iqtree/2.1.2\n\n#store the marker/model combinations in two variables each\nwhile read -r first second; do \nvariable_marker+=(\"$first\")\nvariable_model+=(\"$second\")\ndone < FileLists/best_model_perCOG_for_default.txt\n\n#run trees\n#iqtree2 -s Alignment/v3/bmge/${variable_marker[$SLURM_ARRAY_TASK_ID]}.faa -m ${variable_model[$SLURM_ARRAY_TASK_ID]} -ft Phylogeny/v2/iqtree_lg/${variable_marker[$SLURM_ARRAY_TASK_ID]}.treefile -T 1 -wbtl -B 1000 -bnni --prefix Phylogeny/v2/psmf/${variable_marker[$SLURM_ARRAY_TASK_ID]}_PMSF\n\niqtree2 -s Alignment/v3/bmge/${variable_marker[$SLURM_ARRAY_TASK_ID]}.faa -m ${variable_model[$SLURM_ARRAY_TASK_ID]} -T 1 -wbtl -B 1000 --prefix test/${variable_marker[$SLURM_ARRAY_TASK_ID]}_default\n\nThis works fine and 10 jobs are started in parallel BUT each runs separately on a full node despite requesting just one cpu. So resources are not used well and I was wondering if this is how laplace is setup or if there is a way that I could run 100 jobs at the same time one node has so many cpus?\nI know I can use gnu parallel, but I want to prep the script for a collaborator with arrays."
   }
 ]
